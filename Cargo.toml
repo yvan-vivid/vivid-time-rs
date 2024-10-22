@@ -1,0 +1,4 @@
+[workspace]
+
+members = ["numburs", "mixed_point", "vivid_time", "vivid_time_cli"]
+resolver = "2"

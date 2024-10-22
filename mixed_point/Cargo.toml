@@ -1,0 +1,12 @@
+[package]
+name = "mixed_point"
+version = "0.1.0"
+authors = ["hexxiiiz <hexxiiiz@gmail.com>"]
+edition = "2021"
+
+[dependencies]
+assert_approx_eq = "1.1.0"
+derive_more = "0.99.17"
+num-traits = "0.2.15"
+numburs = { path = "../numburs" }
+serde = { version = "1.0.210", features = ["derive"] }
