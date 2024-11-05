@@ -9,10 +9,27 @@ pub struct Cli {
 
 #[derive(Subcommand)]
 pub enum Command {
-    // to - to vivid
     // from - from vivid
+    To {
+        time: String,
+
+        #[arg(short, long)]
+        json: bool,
+
+        #[arg(short, long)]
+        long: bool,
+
+        #[arg(short, long)]
+        precision: Option<usize>,
+
+        #[arg(short, long)]
+        full: bool,
+    },
     Json,
     Now {
+        #[arg(short, long)]
+        json: bool,
+
         #[arg(short, long)]
         long: bool,
 

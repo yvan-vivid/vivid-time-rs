@@ -8,28 +8,74 @@ use vivid_time::{
     system_n::time::{Date as VividDate, Time as VividTime, TimeWithFraction as VividTimeWithFraction},
 };
 
-fn style_from_flag(long: bool) -> DepthStyle {
-    if long {
-        DepthStyle::Long
-    } else {
-        DepthStyle::Short
+pub struct DateOptions {
+    pub style: DepthStyle,
+}
+
+pub enum TimeOptions {
+    FullWithFraction,
+    Full,
+    Precision(usize),
+}
+
+pub enum OutputSpec {
+    Json,
+    Date(DateOptions),
+    // Clock(TimeOptions),
+    Time { date: DateOptions, time: TimeOptions },
+}
+
+impl DateOptions {
+    pub fn from_flags(long: bool) -> Self {
+        Self {
+            style: if long { DepthStyle::Long } else { DepthStyle::Short },
+        }
     }
 }
 
-pub fn write_date(data: &VividDate, long: bool) -> Result<String> {
-    DateFormatter::standard(" ∘ ", style_from_flag(long))
+impl TimeOptions {
+    pub fn from_flags(full: bool, precision: Option<usize>) -> Self {
+        if full {
+            if precision.is_some() {
+                println!("Warning: using '--full' output, '--precision' is ignored")
+            }
+            return Self::FullWithFraction;
+        }
+        precision.map(Self::Precision).unwrap_or(Self::Full)
+    }
+}
+
+impl OutputSpec {
+    pub fn from_flags(json: bool, long: bool, full: bool, precision: Option<usize>) -> Self {
+        if json {
+            if long || full || precision.is_some() {
+                println!("Warning: using '--json' output, other flags ignored")
+            }
+            return Self::Json;
+        }
+        Self::Time {
+            date: DateOptions::from_flags(long),
+            time: TimeOptions::from_flags(full, precision),
+        }
+    }
+
+    pub fn from_date_flags(long: bool) -> Self {
+        Self::Date(DateOptions::from_flags(long))
+    }
+}
+
+pub fn write_date(data: &VividDate, style: DepthStyle) -> Result<String> {
+    DateFormatter::standard(" ∘ ", style).format(data).map_err(Error::new)
+}
+
+pub fn write_time(data: &VividTime, style: DepthStyle, precision: Option<usize>) -> Result<String> {
+    TimeFormatter::standard(" ∘ ", style, precision)
         .format(data)
         .map_err(Error::new)
 }
 
-pub fn write_time(data: &VividTime, long: bool, precision: Option<usize>) -> Result<String> {
-    TimeFormatter::standard(" ∘ ", style_from_flag(long), precision)
-        .format(data)
-        .map_err(Error::new)
-}
-
-pub fn write_time_with_fraction(data: &VividTimeWithFraction, long: bool) -> Result<String> {
-    TimeWithFractionFormatter::standard(" // ", " ∘ ", style_from_flag(long))
+pub fn write_time_with_fraction(data: &VividTimeWithFraction, style: DepthStyle) -> Result<String> {
+    TimeWithFractionFormatter::standard(" // ", " ∘ ", style)
         .format(data)
         .map_err(Error::new)
 }
@@ -38,23 +84,19 @@ fn output_json<T: Serialize>(t: &T) -> Result<String> {
     serde_json::to_string(t).map_err(Error::from)
 }
 
-fn print_output(serialized: String) -> Result<()> {
-    println!("{}", serialized);
+pub fn print_with_options(twf: &VividTimeWithFraction, options: OutputSpec) -> Result<()> {
+    let output = match options {
+        OutputSpec::Json => output_json(twf)?,
+        OutputSpec::Date(DateOptions { style }) => write_date(&twf.time.date, style)?,
+        OutputSpec::Time {
+            date: DateOptions { style },
+            time,
+        } => match time {
+            TimeOptions::FullWithFraction => write_time_with_fraction(twf, style)?,
+            TimeOptions::Full => write_time(&twf.time, style, None)?,
+            TimeOptions::Precision(precision) => write_time(&twf.time, style, Some(precision))?,
+        },
+    };
+    println!("{}", output);
     Ok(())
-}
-
-pub fn print_date(date: &VividDate, long: bool) -> Result<()> {
-    print_output(write_date(date, long)?)
-}
-
-pub fn print_time(time: &VividTime, long: bool, precision: Option<usize>) -> Result<()> {
-    print_output(write_time(time, long, precision)?)
-}
-
-pub fn print_time_with_fraction(time: &VividTimeWithFraction, long: bool) -> Result<()> {
-    print_output(write_time_with_fraction(time, long)?)
-}
-
-pub fn print_json(time: &VividTimeWithFraction) -> Result<()> {
-    print_output(output_json(time)?)
 }
