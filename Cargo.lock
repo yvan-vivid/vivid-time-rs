@@ -607,6 +607,7 @@ name = "vivid_time_cli"
 version = "0.1.0"
 dependencies = [
  "anyhow",
+ "chrono",
  "clap",
  "dateparser",
  "serde",

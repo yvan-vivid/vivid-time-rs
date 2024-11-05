@@ -10,7 +10,7 @@ pub struct Cli {
 #[derive(Subcommand)]
 pub enum Command {
     // from - from vivid
-    To {
+    ToTime {
         time: String,
 
         #[arg(short, long)]
@@ -24,6 +24,12 @@ pub enum Command {
 
         #[arg(short, long)]
         full: bool,
+    },
+    ToDate {
+        time: String,
+
+        #[arg(short, long)]
+        long: bool,
     },
     Json,
     Now {
