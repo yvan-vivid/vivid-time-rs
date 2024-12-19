@@ -32,7 +32,7 @@ impl<'a, U: NumBase + fmt::Display> PhaseFormatter<'a, U> {
     }
 }
 
-impl<'a, U: NumBase + fmt::Display> Formatter<[Natural<U>]> for PhaseFormatter<'a, U> {
+impl<U: NumBase + fmt::Display> Formatter<[Natural<U>]> for PhaseFormatter<'_, U> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, phase: &[Natural<U>]) -> fmt::Result {
         let phase_length = phase.len();
         let start = phase_length - min(self.precision.unwrap_or(phase_length), phase_length);
@@ -74,7 +74,7 @@ where
     }
 }
 
-impl<'a, U, const N: usize, Cycle, C> Formatter<MixedPoint<U, N, Cycle>> for MixedPointFormatter<'a, U, Cycle, C>
+impl<U, const N: usize, Cycle, C> Formatter<MixedPoint<U, N, Cycle>> for MixedPointFormatter<'_, U, Cycle, C>
 where
     U: NumBase + fmt::Display,
     C: Formatter<Cycle>,

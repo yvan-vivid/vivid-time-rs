@@ -41,7 +41,7 @@ pub enum DepthFormatter<'a> {
     Year(YearFormatter),
 }
 
-impl<'a> Formatter<Depth> for DepthFormatter<'a> {
+impl Formatter<Depth> for DepthFormatter<'_> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, data: &Depth) -> fmt::Result {
         match self {
             DepthFormatter::Depth(formatter) => formatter.fmt(buffer, &data.0.point),
@@ -62,7 +62,7 @@ impl<'a> CalendarFormatter<'a> {
     }
 }
 
-impl<'a> Formatter<Calendar> for CalendarFormatter<'a> {
+impl Formatter<Calendar> for CalendarFormatter<'_> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, data: &Calendar) -> fmt::Result {
         match data {
             Calendar::Span(span) => self.phase.fmt(buffer, &span.0.phase),
@@ -83,7 +83,7 @@ impl<'a> ClockFormatter<'a> {
     }
 }
 
-impl<'a> Formatter<Clock> for ClockFormatter<'a> {
+impl Formatter<Clock> for ClockFormatter<'_> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, data: &Clock) -> fmt::Result {
         self.phase.fmt(buffer, &data.0.phase)
     }
@@ -113,7 +113,7 @@ impl<'a> DateFormatter<'a> {
     }
 }
 
-impl<'a> Formatter<Date> for DateFormatter<'a> {
+impl Formatter<Date> for DateFormatter<'_> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, data: &Date) -> fmt::Result {
         write!(buffer, "∆ ")?;
         self.depth.fmt(buffer, &data.depth)?;
@@ -138,7 +138,7 @@ impl<'a> TimeFormatter<'a> {
     }
 }
 
-impl<'a> Formatter<Time> for TimeFormatter<'a> {
+impl Formatter<Time> for TimeFormatter<'_> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, data: &Time) -> fmt::Result {
         self.date.fmt(buffer, &data.date)?;
         write!(buffer, "{}", self.separator)?;
@@ -171,7 +171,7 @@ impl<'a> TimeWithFractionFormatter<'a> {
     }
 }
 
-impl<'a> Formatter<TimeWithFraction> for TimeWithFractionFormatter<'a> {
+impl Formatter<TimeWithFraction> for TimeWithFractionFormatter<'_> {
     fn fmt<W: fmt::Write>(&self, buffer: &mut W, data: &TimeWithFraction) -> fmt::Result {
         self.time.fmt(buffer, &data.time)?;
         write!(buffer, "{}", self.separator)?;

@@ -24,7 +24,7 @@ pub struct PhaseWithLegend<'a, 'b, U: NumBase, const N: usize> {
     pub label: &'b str,
 }
 
-impl<'a, U: NumBase + Serialize, const N: usize> Serialize for PhaseWithLegend<'a, 'static, U, N> {
+impl<U: NumBase + Serialize, const N: usize> Serialize for PhaseWithLegend<'_, 'static, U, N> {
     fn serialize<S: Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
         let mut state = serializer.serialize_struct(self.label, N)?;
         for (name, phase) in self.legend.name(self.phase).iter().rev() {
